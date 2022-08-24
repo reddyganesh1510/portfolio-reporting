@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const Order = require("../models/Order");
 const Portfolio = require("../models/Portfolio");
 
 router.post("", async (req, res) => {
@@ -27,6 +28,13 @@ router.post("", async (req, res) => {
           }
         );
       }
+      let order = await Order.create({
+        stockName: coin.name,
+        quantity: coin.quantity,
+        price: coin.price,
+        timestamp: coin.date,
+        totalValue: coin.quantity * coin.price,
+      });
       let portfolio = await Portfolio.findOne({ email: email });
       return res.status(200).send({
         portfolio: portfolio,

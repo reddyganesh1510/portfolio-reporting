@@ -13,6 +13,7 @@ app.use(cors());
 const port = 8000;
 
 const db = require("./config/mongoose");
+require("./routes/stockHistory");
 
 const path = require("path");
 app.use(express.json());
