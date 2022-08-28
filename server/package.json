@@ -10,17 +10,23 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@kevincobain2000/json-to-html-table": "^1.0.1",
     "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.1",
     "coingecko-api": "^1.0.10",
     "concurrently": "^6.4.0",
     "cors": "^2.8.5",
+    "create-html": "^4.1.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-form-data": "^2.0.17",
+    "jsdom": "^20.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.1.2",
-    "nodemon": "^2.0.15"
+    "node-html-to-image": "^3.2.4",
+    "nodemailer": "^6.7.8",
+    "nodemon": "^2.0.15",
+    "quickchart-js": "^3.0.2"
   }
 }

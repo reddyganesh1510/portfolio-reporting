@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { baseUrl } from "./config";
 
 export default function Modal() {
   const [Stock, setStock] = useState({
     name: "",
-    quantity: 0,
+    quantity: 1,
     date: Date.now(),
     price: 0,
+    availableStocks: [],
+    totalBuyValue: 0,
   });
   const buyStock = () => {
     let fd = new FormData();
@@ -16,15 +18,62 @@ export default function Modal() {
     axios
       .post(baseUrl + "buy", fd)
       .then((res) => {
-        console.log(res);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  const updateStock = (event) => {
-    const { name, value } = event.target;
 
+  const sellStock = () => {
+    let fd = new FormData();
+    fd.append("email", "reddyganesh1510@gmail.com");
+    fd.append("coin", JSON.stringify(Stock));
+    axios
+      .post(baseUrl + "sell", fd)
+      .then((res) => {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  useEffect(() => {
+    axios
+      .get(baseUrl + "misc/stock-names")
+      .then((res) => {
+        updateStock("availableStocks", res.data.stocks);
+        updateStock("name", res.data.stocks[0]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  useEffect(() => {
+    updateStock("totalBuyValue", Stock.price * Stock.quantity);
+  }, [Stock.name, Stock.quantity, Stock.date, Stock.price]);
+
+  useEffect(() => {
+    axios
+      .post(baseUrl + "misc/stock-price", Stock)
+      .then((res) => {
+        if (res.data.stockPrice == null) {
+          updateStock("price", 0);
+        } else {
+          updateStock("price", res.data.stockPrice.price);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [Stock.name, Stock.date]);
+
+  const updateStock = (name, value) => {
     setStock((prevState) => {
       return {
         ...prevState,
@@ -75,34 +124,53 @@ export default function Modal() {
                     <div className="col-md-6">
                       <div className="form-group">
                         <label>Stock name</label>
-                        <input
+                        <select
+                          name="name"
+                          value={Stock.name}
+                          className="form-control"
+                          onChange={(e) =>
+                            updateStock(e.target.name, e.target.value)
+                          }
+                        >
+                          {Stock.availableStocks.map((item) => {
+                            return <option>{item}</option>;
+                          })}
+                        </select>
+                        {/* <input
                           name="name"
                           type="text"
                           className="form-control"
                           placeholder="Enter Name of the Stock"
-                          onChange={(e) => updateStock(e)}
-                        />
+                          onChange={(e) =>
+                            updateStock(e.target.name, e.target.value)
+                          }
+                        /> */}
                       </div>
                       <div className="form-group">
                         <label>Date</label>
                         <input
                           name="date"
+                          value={Stock.date}
                           type="date"
                           className="form-control"
-                          placeholder="Enter Date of the Stock"
-                          onChange={(e) => updateStock(e)}
+                          onChange={(e) =>
+                            updateStock(e.target.name, e.target.value)
+                          }
                         />
                       </div>
+                      <h6>Total value : {Stock.totalBuyValue.toFixed(2)}</h6>
                     </div>
                     <div className="col-md-6">
                       <div className="form-group">
                         <label>Quantity</label>
                         <input
                           name="quantity"
+                          value={Stock.quantity}
                           type="number"
                           className="form-control"
-                          placeholder="Enter Quantity of the Stock"
-                          onChange={(e) => updateStock(e)}
+                          onChange={(e) =>
+                            updateStock(e.target.name, e.target.value)
+                          }
                         />
                       </div>
 
@@ -112,8 +180,11 @@ export default function Modal() {
                           name="price"
                           type="number"
                           className="form-control"
-                          placeholder="Enter Price of the Stock"
-                          onChange={(e) => updateStock(e)}
+                          value={Stock.price}
+                          disabled
+                          onChange={(e) =>
+                            updateStock(e.target.name, e.target.value)
+                          }
                         />
                       </div>
                     </div>
@@ -124,10 +195,20 @@ export default function Modal() {
                 <button
                   type="button"
                   onClick={buyStock}
+                  disabled={Stock.price > 0 ? false : true}
                   className="btn btn-success mx-3"
                 >
                   Buy
                 </button>
+
+                {/* <button
+                  type="button"
+                  onClick={sellStock}
+                  disabled={Stock.price > 0 ? false : true}
+                  className="btn btn-danger"
+                >
+                  Sell
+                </button> */}
               </div>
             </div>
           </div>
